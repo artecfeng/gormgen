@@ -1,9 +1,9 @@
 ## 执行命令
 
 ```
-go build main.go
-//添加到bin目录，可全局使用
-cp main $GOPATH/bin/gormgen
+git clone git@github.com:artecfeng/gormgen.git
+cd gormgen
+./gormgen.sh
 
 //所有表
 gormgen -addr "root:@tcp(localhost:3306)/ginadmin"
