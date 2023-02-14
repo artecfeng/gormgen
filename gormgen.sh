@@ -12,7 +12,8 @@ fi
 #printf "\n cp gormgen to gopath/bin\n\n"
 #cp main $GOPATH/bin/gormgen
 printf "\n create and generating file\n\n"
-gormgen -addr "root:@tcp(localhost:3306)/ginadmin"  -tables "admin"
+go run main.go -addr "root:@tcp(localhost:3306)/ginadmin"  -tables "admin" -json true
+#gormgen -addr "root:@tcp(localhost:3306)/ginadmin"  -tables "admin"
 shellExit $?
 
 

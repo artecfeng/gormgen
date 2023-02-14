@@ -12,16 +12,18 @@ import (
 func main() {
 	addr := flag.String("addr", "root:@tcp(127.0.0.1:3306)/ginadmin", "请输入 db 地址，例如：root:@tcp(127.0.0.1:3306)/ginadmin\n")
 	table := flag.String("tables", "*", "请输入 table 名称，默认为“*”，多个可用“,”分割\n")
+	withjson := flag.Bool("json", false, "请输入 json ，默认为“false” true false\n")
 	flag.Parse()
 	fmt.Println(*addr)
 	fmt.Println(*table)
+	fmt.Println(*withjson)
 	split := strings.Split(*addr, "/")
 	if len(split) != 2 {
 		os.Exit(0)
 	}
 	dbName := split[1]
 	dbTables := strings.ToLower(*table)
-	err := server.DoGen(*addr, dbName, dbTables)
+	err := server.DoGen(*addr, dbName, dbTables, *withjson)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

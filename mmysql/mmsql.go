@@ -3,11 +3,12 @@ package mmysql
 import (
 	"database/sql"
 	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
-	"strings"
 )
 
 type Db struct {
@@ -160,6 +161,5 @@ func (d *Db) SelectTableColumn(dbName string, tableName string) ([]TableColumn, 
 		}
 		columns = append(columns, column)
 	}
-
 	return columns, err
 }

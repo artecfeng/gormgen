@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func DoGen(addr, dbName, tableName string) error {
+func DoGen(addr, dbName, tableName string, withjson bool) error {
 	db, err := mmysql.New(addr)
 	if err != nil {
 		log.Fatal("new db err", err)
@@ -38,20 +38,28 @@ func DoGen(addr, dbName, tableName string) error {
 			return err
 		}
 		fmt.Println("  └── file : ", table.TableName+"_model.go")
+		columnInfo, err := db.SelectTableColumn(dbName, table.TableName)
 
 		modelContent := fmt.Sprintf("package %s\n", table.TableName)
-		modelContent += fmt.Sprintf(`import "time"`)
+		for _, v := range columnInfo {
+			if textType(v.DataType) == "time.Time" {
+				modelContent += fmt.Sprintf(`import "time"`)
+				break
+			}
+		}
 		modelContent += fmt.Sprintf("\n\n// %s %s \n", Case2Camel(table.TableName), table.TableComment.String)
 		modelContent += fmt.Sprintf("//go:generate gormgen -structs %s -input . \n", Case2Camel(table.TableName))
 		modelContent += fmt.Sprintf("type %s struct {\n", Case2Camel(table.TableName))
 
-		columnInfo, err := db.SelectTableColumn(dbName, table.TableName)
 		if err != nil {
 			continue
 		}
 		for _, info := range columnInfo {
-
-			modelContent += fmt.Sprintf("	%s %s `gorm:\"%s\"` // %s\n", Case2Camel(info.ColumnName), textType(info.DataType), info.ColumnName, info.ColumnComment.String)
+			if withjson {
+				modelContent += fmt.Sprintf("	%s %s `json:\"%s\" gorm:\"%s\"` // %s\n", Case2Camel(info.ColumnName), textType(info.DataType), info.ColumnName, info.ColumnName, info.ColumnComment.String)
+			} else {
+				modelContent += fmt.Sprintf("	%s %s `gorm:\"%s\"` // %s\n", Case2Camel(info.ColumnName), textType(info.DataType), info.ColumnName, info.ColumnComment.String)
+			}
 		}
 		modelContent += "}\n"
 		modelFile.WriteString(modelContent)
